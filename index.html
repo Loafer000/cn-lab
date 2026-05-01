@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CN Lab Programs</title>
+    <title>SQL Database Assignments</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 1200px; margin: 20px auto; padding: 20px; background: #f5f5f5; }
         h1 { color: #333; text-align: center; }
@@ -14,655 +14,549 @@
     </style>
 </head>
 <body>
-    <h1>Computer Networks Lab Programs</h1>
+    <h1>SQL Database Assignments</h1>
 
-    <h2>3. IPC: Program handling PIPE</h2>
-    <h3>a3.c</h3>
-    <pre><code>// a3.c
-#include&lt;stdio.h&gt;
-#include&lt;unistd.h&gt;
-#include&lt;fcntl.h&gt;
-#include&lt;stdlib.h&gt;
+    <h2>Assignment 1: DDL and DML operations</h2>
+    <h3>Creating tables and inserting the provided dataset</h3>
+    <pre><code>-- client_master
+CREATE TABLE client_master (
+    Client_no VARCHAR(6) PRIMARY KEY,
+    Name VARCHAR(30) NOT NULL,
+    Address1 VARCHAR(30),
+    Address2 VARCHAR(30),
+    City VARCHAR(15),
+    State VARCHAR(15),
+    Pincode DECIMAL(6),
+    Bal_due DECIMAL(10,2)
+);
 
-int main(){
-    int fd1,fd2[2],pid,n;
-    char str1[512],str2[512];
-    fd1=open("text1.txt",O_RDWR | O_CREAT,0777);
-    n=read(fd1,str1,512);
-    pipe(fd2);
-    pid=fork();
+INSERT INTO client_master VALUES 
+('C001', 'Ivan Bayross', 'P-76', 'Worli', 'Bombay', 'Maharastra', 400054, 15000),
+('C002', 'VandanaSatiwal', '128', 'Adams Street', 'Madras', 'TamilNadu', 780001, 0),
+('C003', 'PramadaJaguste', '157', 'Gopalpur', 'Kolkata', 'West Bengal', 700058, 5000),
+('C004', 'BasuNavindgi', 'A/12', 'Nariman', 'Bombay', 'Maharastra', 400056, 0),
+('C005', 'Ravi Sreedharan', 'B/34', 'Rajnagar', 'Delhi', 'Delhi', 100001, 2000),
+('C006', 'Rukmini', 'Q-12', 'Bandra', 'Bombay', 'Maharastra', 400050, 0);
 
-    if(pid&gt;0){
-        close(fd2[0]);
-        write(fd2[1],str1,n);
-    }
-    else if(pid==0){
-        close(fd2[1]);
-        read(fd2[0],str2,512);
-        str2[n]='\0';
-        puts(str2);
-    }
-    else{
-        printf("Error in fork()");
-        exit(0);
-    }
-    return 0;
-}</code></pre>
+-- product_master
+CREATE TABLE product_master (
+    Product_no VARCHAR(6) PRIMARY KEY,
+    Description VARCHAR(40) NOT NULL,
+    Profit_percent DECIMAL(4,2) NOT NULL,
+    Unit_measure VARCHAR(10) NOT NULL,
+    Qty_on_hand INT NOT NULL,
+    Reorder_level INT NOT NULL,
+    Sell_price DECIMAL(8,2) NOT NULL,
+    Cost_price DECIMAL(8,2) NOT NULL
+);
 
-    <h2>4. IPC: Program for Client-Server Communication using TCP Socket</h2>
-    <h3>Server Side (server4.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;unistd.h&gt;
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
+INSERT INTO product_master VALUES
+('P00001', '1.44 Floppies', 5, 'Piece', 100, 20, 525, 500),
+('P03453', 'Monitors', 6, 'Piece', 10, 3, 12000, 11280),
+('P06734', 'Mouse', 5, 'Piece', 20, 5, 1050, 1000),
+('P07865', '1.22 Floppies', 5, 'Piece', 100, 20, 525, 500),
+('P07868', 'Keyboard', 2, 'Piece', 10, 3, 3150, 3050),
+('P07885', 'CD Drive', 2.5, 'Piece', 10, 3, 5250, 5100),
+('P07965', '540 HDD', 4, 'Piece', 10, 3, 8400, 8000),
+('P07975', '1.44 Drive', 5, 'Piece', 10, 3, 1050, 900),
+('P08865', '1.22 Drive', 5, 'Piece', 2, 3, 1025, 850);
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd, nsd, clen = sizeof(client);
-    char msg[512];
-    bzero((char *)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-    bind(sd, (struct sockaddr *)&amp;server, sizeof(server));
-    listen(sd, 5);
-    
-    while(1) {
-        nsd = accept(sd, (struct sockaddr *)&amp;client, &amp;clen);
-        do {
-            memset(msg, 0x0, 512);
-            recv(nsd, msg, 512, 0);
-            printf("Message received from client : %s\n", msg);
-            printf("Client's IP : %s \n", inet_ntoa(client.sin_addr));
-            printf("Client's Port : %u\n", ntohs(client.sin_port));
-        } while(strcmp(msg, "stop"));
-        close(nsd);
-    }
-}</code></pre>
+-- salesman_master
+CREATE TABLE salesman_master (
+    Salesman_no VARCHAR(6) PRIMARY KEY,
+    Salesman_name VARCHAR(30) NOT NULL,
+    Address1 VARCHAR(30) NOT NULL,
+    Address2 VARCHAR(30),
+    City VARCHAR(20),
+    Pincode DECIMAL(8),
+    State VARCHAR(20),
+    Sal_amt DECIMAL(8,2) NOT NULL
+);
 
-    <h3>Client Side (client4.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;unistd.h&gt;
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
-#define CLIENT_IP "127.0.0.1"
-#define CLIENT_PORT 4561
+INSERT INTO salesman_master VALUES
+('S001', 'Kiran', 'A/14', 'Worli', 'Bombay', 400002, 'Maharastra', 3000),
+('S002', 'Manish', '65', 'Nariman', 'Bombay', 400001, 'Maharastra', 3000),
+('S003', 'Ravi', 'P-7', 'Bandra', 'Bombay', 400032, 'Maharastra', 3000),
+('S004', 'Asish', 'A/5', 'Juhu', 'Bombay', 400044, 'Maharastra', 3000);
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd;
-    char msg[512];
-    
-    bzero((char *)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    bzero((char *)&amp;client, sizeof(client));
-    client.sin_family = AF_INET;
-    client.sin_addr.s_addr = inet_addr(CLIENT_IP); 
-    client.sin_port = htons(CLIENT_PORT);
-    
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-    connect(sd, (struct sockaddr *)&amp;server, sizeof(server));
-    
-    do {
-        printf("Enter a message : ");
-        scanf("%s", msg);
-        send(sd, msg, strlen(msg)+1, 0);
-    } while(strcmp(msg, "stop"));
-    close(sd);
-}</code></pre>
+-- sales_order
+CREATE TABLE sales_order (
+    Order_no VARCHAR(6) PRIMARY KEY,
+    Order_date DATE,
+    Client_no VARCHAR(6),
+    Salesman_no VARCHAR(6),
+    Delivery_type CHAR(1) DEFAULT 'F',
+    Bill_y_n CHAR(1),
+    Delivery_date DATE,
+    Order_status VARCHAR(10),
+    FOREIGN KEY (Client_no) REFERENCES client_master(Client_no),
+    FOREIGN KEY (Salesman_no) REFERENCES salesman_master(Salesman_no)
+);
 
-    <h2>5. Iterative ECHO Server using TCP</h2>
-    <h3>Server Side (server5.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;unistd.h&gt;
+INSERT INTO sales_order VALUES
+('O19001', '1996-01-12', 'C001', 'S001', 'F', 'N', '1996-01-20', 'InProcess'),
+('O19002', '1996-01-25', 'C002', 'S002', 'P', 'N', '1996-01-27', 'BackOrder'),
+('O46865', '1996-02-18', 'C003', 'S003', 'F', 'Y', '1996-02-20', 'Fullfilled'),
+('O19003', '1996-04-03', 'C001', 'S001', 'F', 'Y', '1996-04-07', 'Fullfilled'),
+('O46866', '1996-05-20', 'C004', 'S002', 'P', 'N', '1996-05-22', 'Cancelled'),
+('O19008', '1996-05-24', 'C005', 'S004', 'F', 'N', '1996-05-26', 'InProcess');
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
+-- sales_order_details
+CREATE TABLE sales_order_details (
+    Order_no VARCHAR(6),
+    Product_no VARCHAR(6),
+    Qty_ordered INT,
+    Qty_disp INT,
+    Product_rate DECIMAL(10,2),
+    FOREIGN KEY (Order_no) REFERENCES sales_order(Order_no),
+    FOREIGN KEY (Product_no) REFERENCES product_master(Product_no)
+);
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd, nsd, clen = sizeof(client);
-    char msg[512];
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-    bind(sd, (struct sockaddr *)&amp;server, sizeof(server));
-    listen(sd, 5);
-    
-    while(1) {
-        nsd = accept(sd, (struct sockaddr *)&amp;client, &amp;clen);
-        do {
-            memset(msg, 0x0, 512);
-            recv(nsd, msg, 512, 0);
-            printf("Message from client: %s\n", msg);
-            send(nsd, msg, strlen(msg)+1, 0);
-        } while(strcmp(msg, "stop"));
-        close(nsd);
-    }
-    close(sd);
-}</code></pre>
+INSERT INTO sales_order_details VALUES
+('O19001', 'P00001', 4, 4, 525), ('O19001', 'P07965', 2, 1, 8400),
+('O19001', 'P07885', 2, 1, 5250), ('O19002', 'P00001', 10, 0, 525),
+('O46865', 'P07868', 3, 3, 3150), ('O46865', 'P07885', 3, 1, 5250),
+('O46865', 'P00001', 10, 10, 525), ('O46865', 'P03453', 4, 4, 1050),
+('O19003', 'P03453', 2, 2, 1050), ('O19003', 'P06734', 1, 1, 12000),
+('O46866', 'P07965', 1, 0, 8400), ('O46866', 'P07975', 1, 0, 1050),
+('O19008', 'P00001', 10, 5, 525), ('O19008', 'P07975', 5, 3, 1050);</code></pre>
 
-    <h3>Client Side (client5.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;unistd.h&gt;
+    <h2>Assignment 2: Simple SQL Queries</h2>
+    <pre><code>-- 1. Find names with 'a' as second letter
+SELECT Name FROM client_master WHERE Name LIKE '_a%';
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
-#define CLIENT_IP "192.168.6.85"
-#define CLIENT_PORT 4561
+-- 2. Clients who do not stay in city starting with 'B'
+SELECT * FROM client_master WHERE City NOT LIKE 'B%';
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd;
-    char msg[512];
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    bzero((char*)&amp;client, sizeof(client));
-    client.sin_family = AF_INET;
-    client.sin_addr.s_addr = inet_addr(CLIENT_IP);
-    client.sin_port = htons(CLIENT_PORT);
-    
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-    connect(sd, (struct sockaddr*)&amp;server, sizeof(server));
-    
-    do {
-        printf("Enter a message: ");
-        scanf("%s", msg);
-        send(sd, msg, strlen(msg)+1, 0);
-        recv(sd, msg, 512, 0);
-        printf("Echoed from server: %s\n", msg);
-    } while(strcmp(msg, "stop"));
-    
-    close(sd);
-}</code></pre>
+-- 3. Clients with exact 12 chars length starting with 'I'
+SELECT Name, City FROM client_master WHERE LENGTH(Name) = 12 AND Name LIKE 'I%';
 
-    <h2>6. Iterative Day-Time Server using TCP</h2>
-    <h3>Server Side (server6.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;time.h&gt;
+-- 4. Clients in Bombay or Delhi
+SELECT * FROM client_master WHERE City IN ('Bombay', 'Delhi');
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
+-- 5. Bal_due > 10,000
+SELECT * FROM client_master WHERE Bal_due > 10000;
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd, nsd, clen = sizeof(client);
-    char msg[512], msg1[512] = "Invalid request ";
-    char *ptr;
-    time_t ti;
-    
-    bzero((char*) &amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-    bind(sd, (struct sockaddr *)&amp;server, sizeof(server));
-    listen(sd, 5);
-    
-    while(1) {
-        nsd = accept(sd, (struct sockaddr *)&amp;client, &amp;clen);
-        do {
-            memset(msg, 0x0, 512);
-            recv(nsd, msg, 512, 0);
-            if (!strcmp(msg, "time")) {
-                ti = time(NULL);
-                ptr = ctime(&amp;ti);
-                send(nsd, ptr, strlen(ptr)+1, 0);
-            } else {
-                send(nsd, msg1, strlen(msg1)+1, 0);
-            }
-        } while(strcmp(msg, "stop"));
-        close(nsd);
-    }
-    close(sd);
-}</code></pre>
+-- 6. Orders in January
+SELECT * FROM sales_order WHERE MONTH(Order_date) = 1;
 
-    <h3>Client Side (client6.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
+-- 7. Orders for C001 and C002
+SELECT * FROM sales_order WHERE Client_no IN ('C001', 'C002');
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
-#define CLIENT_IP "192.168.6.85"
-#define CLIENT_PORT 4561
+-- 8. Sell price between 2000 and 5000
+SELECT * FROM product_master WHERE Sell_price > 2000 AND Sell_price < 5000;
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd;
-    char msg[512];
-    
-    bzero((char *) &amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT); 
-    
-    bzero((char *) &amp;client, sizeof(client));
-    client.sin_family = AF_INET;
-    client.sin_addr.s_addr = inet_addr(CLIENT_IP);
-    client.sin_port = htons(CLIENT_PORT);
-    
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-    connect(sd, (struct sockaddr *)&amp;server, sizeof(server));
-    
-    do {
-        printf("Enter a message: ");
-        scanf("%s", msg);
-        send(sd, msg, strlen(msg)+1, 0);
-        recv(sd, msg, 512, 0);
-        printf("Echoed from server: %s\n", msg);
-    } while (strcmp(msg, "stop"));
-    
-    close(sd);
-}</code></pre>
+-- 9. Sell price > 1500, calculate new price
+SELECT Product_no, Description, Sell_price * 1.15 AS New_price 
+FROM product_master WHERE Sell_price > 1500;
 
-    <h2>7. Iterative ECHO Server using UDP</h2>
-    <h3>Server Side (server7.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;netinet/in.h&gt;
+-- 10. Clients not in Maharastra
+SELECT Name, City, State FROM client_master WHERE State != 'Maharastra';
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
+-- 11. Delivery month and date
+SELECT MONTHNAME(Delivery_date) AS Month, DAY(Delivery_date) AS Date FROM sales_order;
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd, clen = sizeof(client);
-    char msg[512];
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    sd = socket(AF_INET, SOCK_DGRAM, 0);
-    bind(sd, (struct sockaddr *)&amp;server, sizeof(server));
-    
-    while(1) {
-        do {
-            memset(msg, 0x0, 512);
-            recvfrom(sd, msg, 512, 0, (struct sockaddr *)&amp;client, &amp;clen);
-            printf("Message from client: %s\n", msg);
-            sendto(sd, msg, 512, 0, (struct sockaddr *)&amp;client, clen);
-        } while(strcmp(msg, "stop"));
-    }
-    close(sd);
-}</code></pre>
+-- 12. Order date format
+SELECT DATE_FORMAT(Order_date, '%d-%M-%y') AS Formatted_Date FROM sales_order;
 
-    <h3>Client Side (client7.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;unistd.h&gt;
+-- 13. Date 15 days after today
+SELECT DATE_ADD(CURDATE(), INTERVAL 15 DAY) AS Future_Date;</code></pre>
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 4560
-#define CLIENT_IP "192.168.6.85"
-#define CLIENT_PORT 4561
+    <h2>Assignment 3: Aggregates and Updates</h2>
+    <pre><code>-- 1. Total orders
+SELECT COUNT(*) FROM sales_order;
 
-void main() {
-    struct sockaddr_in client, server;
-    int sd, slen = sizeof(server);
-    char msg[512], msg1[512];
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    bzero((char*)&amp;client, sizeof(client));
-    client.sin_family = AF_INET;
-    client.sin_addr.s_addr = inet_addr(CLIENT_IP);
-    client.sin_port = htons(CLIENT_PORT);
-    
-    sd = socket(AF_INET, SOCK_DGRAM, 0);
-    
-    do {
-        printf("Enter a message: ");
-        scanf("%s", msg);
-        sendto(sd, msg, strlen(msg)+1, 0, (struct sockaddr *)&amp;server, sizeof(server));
-        recvfrom(sd, msg1, 512, 0, (struct sockaddr *)&amp;server, &amp;slen);
-        printf("Echoed from server: %s\n", msg1);
-    } while(strcmp(msg, "stop"));
-    
-    close(sd);
-}</code></pre>
+-- 2. Avg product price
+SELECT AVG(Sell_price) FROM product_master;
 
-    <h2>8. Iterative Day Time Server using UDP</h2>
-    <h3>Server Side (server8.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;time.h&gt;
+-- 3. Products price >= 1500
+SELECT COUNT(*) FROM product_master WHERE Sell_price >= 1500;
 
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 10550
+-- 4. Max and min prices
+SELECT MAX(Sell_price) AS max_price, MIN(Sell_price) AS min_price FROM product_master;
 
-int main() {
-    struct sockaddr_in client, server;
-    int sd, nsd, clen = sizeof(client);
-    char str[512], str1[512] = "invalid request";
-    char *ptr;
-    time_t ti;
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    sd = socket(AF_INET, SOCK_DGRAM, 0);
-    bind(sd, (struct sockaddr*)&amp;server, sizeof(server));
-    
-    while(1) {
-        do {
-            memset(str, 0x0, 512);
-            recvfrom(sd, str, 512, 0, (struct sockaddr*)&amp;client, &amp;clen);
-            
-            if (!strcmp(str, "time")) {
-                ti = time(NULL);
-                ptr = ctime(&amp;ti);
-                sendto(sd, ptr, strlen(ptr)+1, 0, (struct sockaddr*)&amp;client, clen);
-            } else {
-                sendto(sd, str1, strlen(str1)+1, 0, (struct sockaddr*)&amp;client, clen);
-            }
-        } while (strcmp(str, "stop"));
-    }
-    close(sd);
-    return 0;
-}</code></pre>
+-- 5. Change City
+UPDATE client_master SET City = 'Madras' WHERE Client_no = 'C005';
 
-    <h3>Client Side (client8.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;unistd.h&gt;
+-- 6. Change Balance
+UPDATE client_master SET Bal_due = 3000 WHERE Client_no = 'C005';
 
-#define CLIENT_IP "127.0.0.1"
-#define SERVER_IP "127.0.0.1"
-#define CLIENT_PORT 10555
-#define SERVER_PORT 10550
+-- 7. Delete Tamilnadu state
+DELETE FROM client_master WHERE State = 'TamilNadu';
 
-int main() {
-    struct sockaddr_in client, server;
-    int sd, slen = sizeof(server);
-    char msg[512];
-    
-    bzero((char*)&amp;client, sizeof(client));
-    client.sin_family = AF_INET;
-    client.sin_addr.s_addr = inet_addr(CLIENT_IP);
-    client.sin_port = htons(CLIENT_PORT);
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr(SERVER_IP);
-    server.sin_port = htons(SERVER_PORT);
-    
-    sd = socket(AF_INET, SOCK_DGRAM, 0);
-    connect(sd, (struct sockaddr*)&amp;server, sizeof(server));
-    
-    do {
-        printf("Enter a message to send to server: ");
-        scanf("%s", msg);
-        sendto(sd, msg, strlen(msg)+1, 0, (struct sockaddr*)&amp;server, sizeof(server));
-        memset(msg, 0x0, 512);
-        recvfrom(sd, msg, 512, 0, (struct sockaddr*)&amp;server, &amp;slen);
-        printf("Echoed message from server: %s\n", msg);
-    } while(strcmp(msg, "stop"));
-    
-    close(sd);
-    return 0;
-}</code></pre>
+-- 8. Add Telephone column
+ALTER TABLE client_master ADD Telephone VARCHAR(10);
 
-    <h2>9. Concurrent ECHO Server using TCP</h2>
-    <h3>Server Side (server9.c)</h3>
-    <pre><code>#include&lt;stdio.h&gt;
-#include&lt;unistd.h&gt;
-#include&lt;sys/socket.h&gt;
-#include&lt;sys/types.h&gt;
-#include&lt;netinet/in.h&gt;
-#include&lt;string.h&gt;
-#include&lt;arpa/inet.h&gt;
+-- 9. Change Pincode size
+ALTER TABLE client_master MODIFY Pincode DECIMAL(10);
 
-#define server_ip "127.0.0.3"
-#define server_port 5780
+-- 10. Drop Address2
+ALTER TABLE client_master DROP COLUMN Address2;
 
-int main(){
-    struct sockaddr_in client,server;
-    int sd,nsd ,clen=sizeof(client);
-    char str[512];
-    int pid;
+-- 11. Create duplicate structure
+CREATE TABLE client_master_duplicate LIKE client_master;
+
+-- 12. Insert data
+INSERT INTO client_master_duplicate SELECT * FROM client_master;
+
+-- 13. Rename table
+RENAME TABLE client_master_duplicate TO c_master;
+
+-- 14. Drop table
+DROP TABLE c_master;</code></pre>
+
+    <h2>Assignment 4 & 5: Employee and Department Queries</h2>
+    <h3>Assignment 4 Queries</h3>
+    <pre><code>-- 1. Right align to 15 chars
+SELECT LPAD(ename, 15, ' ') FROM emp;
+
+-- 2. Pad right to 15 chars with *
+SELECT RPAD(ename, 15, '*') FROM emp;
+
+-- 3. Complex logic
+SELECT * FROM emp WHERE (job = 'MANAGER' AND deptno = 10) 
+   OR (job = 'CLERK' AND deptno = 20) 
+   OR (job NOT IN ('MANAGER', 'CLERK') AND sal >= 2000);
+
+-- 4. Joined between dates
+SELECT * FROM emp WHERE hiredate BETWEEN '1981-02-01' AND '1981-08-31';
+
+-- 5. Joined as manager in 1981
+SELECT * FROM emp WHERE job = 'MANAGER' AND YEAR(hiredate) = 1981;
+
+-- 6. Specific salaries
+SELECT * FROM emp WHERE sal IN (800, 1600, 2450);
+
+-- 7. Specific jobs
+SELECT ename FROM emp WHERE job IN ('CLERK', 'SALESMAN', 'ANALYST');
+
+-- 8. Group by department
+SELECT deptno, COUNT(*) AS Total_Employees, AVG(sal) AS Average_Salary 
+FROM emp GROUP BY deptno;
+
+-- 9. Avg salary dept 30
+SELECT AVG(sal) FROM emp WHERE deptno = 30;
+
+-- 10 & 11. Min/Max Salary
+SELECT MIN(sal) FROM emp WHERE job = 'CLERK';
+SELECT MAX(sal) FROM emp WHERE job = 'SALESMAN';
+
+-- 12. Boss in different dept
+SELECT e.ename FROM emp e 
+JOIN emp m ON e.mgr = m.empno 
+WHERE e.deptno != m.deptno;
+
+-- 13. No commission
+SELECT COUNT(*) FROM emp WHERE comm IS NULL OR comm = 0;
+
+-- 14. Dept with no employees
+SELECT deptno FROM dept WHERE deptno NOT IN (SELECT DISTINCT deptno FROM emp);</code></pre>
+
+    <h3>Assignment 5 Queries</h3>
+    <pre><code>-- 1. Order by dept name
+SELECT e.ename, d.dname, d.loc FROM emp e 
+JOIN dept d ON e.deptno = d.deptno ORDER BY d.dname;
+
+-- 2. Dallas descending salary
+SELECT e.* FROM emp e JOIN dept d ON e.deptno = d.deptno 
+WHERE d.loc = 'DALLAS' ORDER BY e.sal DESC;
+
+-- 3. Dallas details
+SELECT e.ename, d.dname, e.job, d.loc FROM emp e 
+JOIN dept d ON e.deptno = d.deptno WHERE d.loc = 'DALLAS';
+
+-- 4. Computed columns
+SELECT ename, sal, sal*0.1 AS PF, sal*0.6 AS HRA, sal*0.4 AS DA, 
+(sal + sal*0.1 + sal*0.6 + sal*0.4) AS gross FROM emp ORDER BY gross ASC;
+
+-- 5. Report to KING
+SELECT ename, sal FROM emp 
+WHERE mgr = (SELECT empno FROM emp WHERE ename = 'KING');
+
+-- 6. Dallas earning > Chicago max
+SELECT e.* FROM emp e JOIN dept d ON e.deptno = d.deptno 
+WHERE d.loc = 'DALLAS' AND e.sal > (
+    SELECT MAX(sal) FROM emp e2 JOIN dept d2 ON e2.deptno = d2.deptno 
+    WHERE d2.loc = 'CHICAGO'
+);
+
+-- 7. Same post as Smith
+SELECT * FROM emp WHERE job = (SELECT job FROM emp WHERE ename = 'SMITH') AND ename != 'SMITH';
+
+-- 8. Job highest avg salary
+SELECT job FROM emp GROUP BY AVG(sal) DESC LIMIT 1;
+
+-- 9. Top 10 earners
+SELECT * FROM emp ORDER BY sal DESC LIMIT 10;
+
+-- 10. Replace chars
+SELECT REPLACE(ename, 'A', 'a') FROM emp;
+
+-- 11. Round salary (nearest 1000)
+SELECT sal, ROUND(sal, -3) FROM emp;
+
+-- 12. First 3 and last 3 chars
+SELECT SUBSTRING(ename, 1, 3) AS First_3, RIGHT(ename, 3) AS Last_3 FROM emp;</code></pre>
+
+    <h2>Assignment 6: Views</h2>
+    <pre><code>-- 1. Create client view
+CREATE VIEW vw_client_master AS 
+SELECT Client_no, Name, Address1, Bal_due FROM client_master;
+
+-- 1a, 1b, 1c (DML on view)
+INSERT INTO vw_client_master (Client_no, Name, Address1, Bal_due) VALUES ('C007', 'Test', 'Add', 100);
+UPDATE vw_client_master SET Bal_due = 500 WHERE Client_no = 'C007';
+DELETE FROM vw_client_master WHERE Client_no = 'C007';
+
+-- 2. Create sales view
+CREATE VIEW Vw_sales_det AS 
+SELECT c.Client_no, o.Order_no, o.Order_date, od.Product_no, od.Qty_ordered, o.Order_status 
+FROM sales_order o JOIN sales_order_details od ON o.Order_no = od.Order_no 
+JOIN client_master c ON o.Client_no = c.Client_no 
+WHERE o.Order_status = 'BackOrder';
+
+-- 2d. Drop views
+DROP VIEW vw_client_master;
+DROP VIEW Vw_sales_det;</code></pre>
+
+    <h2>Assignment 7: PL/SQL implemented as Stored Procedures</h2>
+    <pre><code>DELIMITER //
+
+-- 1. Factorial
+CREATE PROCEDURE GetFactorial(IN num INT, OUT fact BIGINT)
+BEGIN
+    DECLARE i INT DEFAULT 1;
+    SET fact = 1;
+    WHILE i <= num DO
+        SET fact = fact * i;
+        SET i = i + 1;
+    END WHILE;
+END //
+
+-- 2. Sum of N numbers
+CREATE PROCEDURE GetSumOfN(IN n INT, OUT total INT)
+BEGIN
+    SET total = (n * (n + 1)) / 2;
+END //
+
+-- 3. Leap Year
+CREATE PROCEDURE CheckLeapYear(IN yr INT)
+BEGIN
+    IF (yr % 4 = 0 AND yr % 100 != 0) OR (yr % 400 = 0) THEN
+        SELECT 'Leap Year' AS Result;
+    ELSE
+        SELECT 'Not Leap Year' AS Result;
+    END IF;
+END //
+
+-- 5. Areas Table and Process
+CREATE TABLE Areas (Radius INT, Area DECIMAL(10,2));
+CREATE PROCEDURE CalculateAreas()
+BEGIN
+    DECLARE r INT DEFAULT 6;
+    WHILE r <= 10 DO
+        INSERT INTO Areas (Radius, Area) VALUES (r, PI() * r * r);
+        SET r = r + 1;
+    END WHILE;
+END //
+
+-- 6. Add 1000 to bal_due (Max 6000 check)
+CREATE PROCEDURE UpdateClientBal(IN p_client_no VARCHAR(6))
+BEGIN
+    DECLARE current_bal DECIMAL(10,2);
+    SELECT Bal_due INTO current_bal FROM client_master WHERE Client_no = p_client_no;
+    IF current_bal < 6000 THEN
+        UPDATE client_master SET Bal_due = Bal_due + 1000 WHERE Client_no = p_client_no;
+    END IF;
+END //
+
+DELIMITER ;</code></pre>
+
+    <h2>Assignment 8: Prime Entries and Triggers</h2>
+    <pre><code>CREATE TABLE Prime_Entry (
+    Num_id INT AUTO_INCREMENT PRIMARY KEY,
+    Prime_num INT NOT NULL UNIQUE
+);
+
+DELIMITER //
+CREATE FUNCTION IsPrime(p_num INT) RETURNS BOOLEAN DETERMINISTIC
+BEGIN
+    DECLARE i INT DEFAULT 2;
+    IF p_num <= 1 THEN RETURN FALSE; END IF;
+    WHILE i <= p_num / 2 DO
+        IF p_num % i = 0 THEN RETURN FALSE; END IF;
+        SET i = i + 1;
+    END WHILE;
+    RETURN TRUE;
+END //
+
+CREATE PROCEDURE AddPrime(IN p_num INT)
+BEGIN
+    DECLARE EXIT HANDLER FOR 1062 SELECT 'Number already exists in database' AS Error;
+    IF IsPrime(p_num) THEN
+        INSERT INTO Prime_Entry (Prime_num) VALUES (p_num);
+        SELECT 'Prime Inserted' AS Message;
+    ELSE
+        SELECT 'Not a Prime' AS Message;
+    END IF;
+END //
+DELIMITER ;
+
+-- Acc_details and Transactions_Acc setup
+CREATE TABLE Acc_details (
+    Acc_no VARCHAR(8) PRIMARY KEY,
+    Name VARCHAR(20) NOT NULL,
+    Address VARCHAR(20) NOT NULL,
+    DOB DATE NOT NULL,
+    Sex CHAR(1) CHECK (Sex IN ('M', 'F')) NOT NULL,
+    Contact_no DECIMAL(10) NOT NULL,
+    Last_trans_date DATE NOT NULL,
+    Total_amt DECIMAL(12,4) NOT NULL,
+    Acc_status CHAR(1) CHECK (Acc_status IN ('A', ' ')) NOT NULL
+);
+
+CREATE TABLE Transactions_Acc (
+    Transaction_id INT PRIMARY KEY,
+    Acc_no VARCHAR(8) NOT NULL,
+    Deposit_amt DECIMAL(12,4),
+    Withdraw_amt DECIMAL(12,4),
+    Mode_trans CHAR(5) NOT NULL,
+    Cheque_no INT DEFAULT 0,
+    Trans_date DATE NOT NULL,
+    FOREIGN KEY (Acc_no) REFERENCES Acc_details(Acc_no) ON DELETE CASCADE
+);</code></pre>
+
+    <h2>Assignment 9 & 10: Advanced Procedures, Cursors, Auditing</h2>
+    <h3>Assignment 9 Code</h3>
+    <pre><code>DELIMITER //
+-- 1. Withdraw simulation with Undo/Savepoint
+CREATE PROCEDURE AdvancedWithdraw(IN p_acc_no VARCHAR(8))
+BEGIN
+    DECLARE v_total DECIMAL(12,4);
+    START TRANSACTION;
+    UPDATE Acc_details SET Total_amt = Total_amt - 500 WHERE Acc_no = p_acc_no;
+    SAVEPOINT sp1;
+    UPDATE Acc_details SET Total_amt = Total_amt - 500 WHERE Acc_no = p_acc_no;
+    SELECT Total_amt INTO v_total FROM Acc_details WHERE Acc_no = p_acc_no;
+    IF v_total < 1000 THEN
+        ROLLBACK TO sp1;
+        SELECT 'Undoing last transaction. Balance below 1000' AS Status;
+    END IF;
+    COMMIT;
+END //
+
+-- 2. Update Location
+CREATE PROCEDURE UpdateDeptLocation(IN p_deptno INT, IN p_loc VARCHAR(13))
+BEGIN
+    UPDATE dept SET loc = p_loc WHERE deptno = p_deptno;
+    IF ROW_COUNT() > 0 THEN
+        SELECT 'Department updated successfully (SQL%FOUND)' AS Message;
+    ELSE
+        SELECT 'Department not found (SQL%NOTFOUND)' AS Message;
+    END IF;
+END //
+
+-- 3. Show Employee Name with Exception Handling
+CREATE PROCEDURE FindEmployee(IN p_empno INT)
+BEGIN
+    DECLARE v_ename VARCHAR(10);
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SELECT 'NOT FOUND' AS Message;
+    SELECT ename INTO v_ename FROM emp WHERE empno = p_empno;
+    IF v_ename IS NOT NULL THEN
+        SELECT v_ename AS Employee_Name;
+    END IF;
+END //
+
+-- 5. Emp Salary Increment Process
+CREATE PROCEDURE ProcessResearchIncrements()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_id INT;
+    DECLARE v_sal DECIMAL(7,2);
+    DECLARE cur CURSOR FOR SELECT empno, sal FROM emp WHERE deptno = 20; -- RESEARCH is dept 20
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
     
-    bzero((char *)&amp;server,sizeof(server));
-    server.sin_addr.s_addr=inet_addr(server_ip);
-    server.sin_port=htons(server_port);
-    server.sin_family=AF_INET;
-    
-    sd=socket(AF_INET,SOCK_STREAM,0);
-    bind(sd,(struct sockaddr*)&amp;server,sizeof(server));
-    listen(sd,5);
-    
-    while(1)
-    {
-        nsd=accept(sd,(struct sockaddr*)&amp;client,&amp;clen);
-        pid=fork();
+    CREATE TABLE IF NOT EXISTS Emp_sal_inc (
+        Emp_id INT, Cur_sal DECIMAL(7,2), Inc_date DATE
+    );
+
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO v_id, v_sal;
+        IF done THEN LEAVE read_loop; END IF;
         
-        if(pid&gt;0){
-            close(nsd);
-        }
-        else if(pid&lt;0){
-            printf("error in fork");
-            break;
-        }
-        else{
-            do{
-                memset(str,0x0,512);
-                recv(nsd,str,512,0);
-                send(nsd,str,strlen(str)+1,0);
-            } while(strcmp(str,"stop"));
-        }
-    }
-}</code></pre>
+        UPDATE emp SET sal = sal * 1.02 WHERE empno = v_id;
+        INSERT INTO Emp_sal_inc VALUES (v_id, v_sal * 1.02, CURDATE());
+    END LOOP;
+    CLOSE cur;
+END //
+DELIMITER ;</code></pre>
 
-    <h3>Client Side (client9.c)</h3>
-    <pre><code>#include&lt;stdio.h&gt;
-#include&lt;sys/types.h&gt;
-#include&lt;sys/socket.h&gt;
-#include&lt;netinet/in.h&gt;
-#include&lt;string.h&gt;
-#include&lt;arpa/inet.h&gt;
+    <h3>Assignment 10 Code</h3>
+    <pre><code>DELIMITER //
+-- 1. Apply 2% interest using Cursors & Functions
+CREATE FUNCTION Gen_Trans_ID() RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE next_id INT;
+    SELECT IFNULL(MAX(Transaction_id), 0) + 1 INTO next_id FROM Transactions_Acc;
+    RETURN next_id;
+END //
 
-#define client_ip "127.0.0.3"
-#define client_port 5779
-#define server_ip "127.0.0.3"
-#define server_port 5780
+CREATE PROCEDURE AddInterest()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_acc VARCHAR(8);
+    DECLARE v_amt DECIMAL(12,4);
+    DECLARE v_interest DECIMAL(12,4);
+    DECLARE cur CURSOR FOR SELECT Acc_no, Total_amt FROM Acc_details WHERE Acc_status = 'A';
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-int main(){
-    struct sockaddr_in client,server;
-    int sd;
-    char msg[512],msg1[512];
-    
-    bzero((char *)&amp;client,sizeof(client));
-    client.sin_addr.s_addr=inet_addr(client_ip);
-    client.sin_port=htons(client_port);
-    client.sin_family=AF_INET;
-    
-    bzero((char *)&amp;server,sizeof(server));
-    server.sin_addr.s_addr=inet_addr(server_ip);
-    server.sin_port=htons(server_port);
-    server.sin_family=AF_INET;
-    
-    sd=socket(AF_INET,SOCK_STREAM,0);
-    connect(sd,(struct sockaddr*)&amp;server,sizeof(server));
-    
-    do{
-        printf("enter the msg:");
-        scanf("%s",msg);
-        send(sd,msg,strlen(msg)+1,0);
-        memset(msg1,0x0,512);
-        recv(sd,msg1,512,0);
-        printf("Message receive from server:%s\n",msg1);
-    }while(strcmp(msg,"stop"));
-    
-    close(sd); 
-    return 0;
-}</code></pre>
-
-    <h2>10. Sliding Window Protocol</h2>
-    <h3>Server Side (server10.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;string.h&gt;
-#include &lt;unistd.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;time.h&gt;
-
-#define S_IP "127.0.0.1"
-#define S_PORT 15550
-
-int main() {
-    struct sockaddr_in client, server;
-    int s, ns, clen=sizeof(client);
-    char frame;
-    int ack=0;
-    char msg1[]="Invalid request";
-    char msg[512];
-    time_t ti;
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family=AF_INET;
-    server.sin_addr.s_addr=inet_addr(S_IP);
-    server.sin_port=htons(S_PORT);
-    
-    s=socket(AF_INET, SOCK_STREAM, 0);
-    bind(s, (struct sockaddr *)&amp;server, sizeof(server));
-    listen(s, 5);
-    
-    ns=accept(s, (struct sockaddr *)&amp;client, &amp;clen);
-    
-    while(1) {
-        int n = recv(ns, &amp;frame, sizeof(char), 0);
-        if (n &lt;= 0) break;
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO v_acc, v_amt;
+        IF done THEN LEAVE read_loop; END IF;
         
-        printf("received frame: %c\n", frame);
-        ack++;
-        send(ns, &amp;ack, sizeof(int), 0);
-    }
-    
-    close(ns);
-    close(s);
-    return 0;
-}</code></pre>
-
-    <h3>Client Side (client10.c)</h3>
-    <pre><code>#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;sys/types.h&gt;
-#include &lt;netinet/in.h&gt;
-#include &lt;arpa/inet.h&gt;
-#include &lt;unistd.h&gt;
-
-#define C_IP "127.0.0.1"
-#define S_IP "127.0.0.1"
-#define S_PORT 15550
-#define C_PORT 15550
-
-int main() {
-    struct sockaddr_in client, server;
-    int s;
-    int counter=0, w=3, ack, i;
-    char msg[]="MCKVIE";
-    int total=strlen(msg);
-    
-    bzero((char*)&amp;client, sizeof(client));
-    client.sin_family=AF_INET;
-    client.sin_addr.s_addr=inet_addr(C_IP);
-    client.sin_port=htons(C_PORT);
-    
-    bzero((char*)&amp;server, sizeof(server));
-    server.sin_family=AF_INET;
-    server.sin_addr.s_addr=inet_addr(S_IP);
-    server.sin_port=htons(S_PORT);
-    
-    s=socket(AF_INET, SOCK_STREAM, 0);
-    bind(s, (struct sockaddr *)&amp;client, sizeof(client));
-    connect(s, (struct sockaddr *)&amp;server, sizeof(server));
-    
-    while(counter&lt;total) {
-        for(i=counter; i&lt;w+counter &amp;&amp; i&lt;total; i++) {
-            printf("sent frame %c\n", msg[i]);
-            send(s, &amp;msg[i], sizeof(char), 0);
-        }
+        SET v_interest = v_amt * 0.02;
+        UPDATE Acc_details SET Total_amt = Total_amt + v_interest WHERE Acc_no = v_acc;
         
-        recv(s, &amp;ack, sizeof(int), 0);
-        printf("Received ack: %d\n", ack);
-        counter=ack+2; 
-    }
-    
-    close(s);
-    return 0;
-}</code></pre>
+        INSERT INTO Transactions_Acc (Transaction_id, Acc_no, Deposit_amt, Withdraw_amt, Mode_trans, Trans_date)
+        VALUES (Gen_Trans_ID(), v_acc, v_interest, 0, 'CASH', CURDATE());
+    END LOOP;
+    CLOSE cur;
+END //
+DELIMITER ;
+
+-- 2. Audit Table & Triggers
+CREATE TABLE Emp_audit (
+    Emp_no DECIMAL(4) PRIMARY KEY,
+    Dept_no DECIMAL(4) NOT NULL,
+    Status VARCHAR(8),
+    Salary DECIMAL(8,2) NOT NULL,
+    Audit_date DATE NOT NULL,
+    FOREIGN KEY (Dept_no) REFERENCES dept(deptno)
+);
+
+DELIMITER //
+CREATE TRIGGER trg_audit_update
+AFTER UPDATE ON emp FOR EACH ROW
+BEGIN
+    INSERT IGNORE INTO Emp_audit (Emp_no, Dept_no, Status, Salary, Audit_date)
+    VALUES (OLD.empno, OLD.deptno, 'UPDATED', OLD.sal, CURDATE());
+END //
+
+CREATE TRIGGER trg_audit_delete
+AFTER DELETE ON emp FOR EACH ROW
+BEGIN
+    INSERT IGNORE INTO Emp_audit (Emp_no, Dept_no, Status, Salary, Audit_date)
+    VALUES (OLD.empno, OLD.deptno, 'DELETED', OLD.sal, CURDATE());
+END //
+DELIMITER ;
+
+-- 2c. Update employee command
+UPDATE emp SET sal = 4000 WHERE empno = 7369;
+-- The output/effect: The row in 'emp' updates successfully. 
+-- Simultaneously, the trg_audit_update trigger fires and inserts a record 
+-- into Emp_audit table with the OLD values before the update.</code></pre>
 
 </body>
 </html>
